@@ -3,7 +3,8 @@ package points
 import "core:os"
 import "core:strconv"
 import "core:strings"
-Read_Points_Error :: union {
+
+Read_Points_Error :: union #shared_nil {
 	os.Error,
 	Read_Points_Parse_Error,
 }
