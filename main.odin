@@ -28,16 +28,11 @@ main :: proc() {
 	defer delete(data_points)
 
 	normalized_points := points.normalize(data_points[:])
+	prefix_area := points.calculate_area_prefix(normalized_points)
 	quadratics := points.calculate_quadratics(normalized_points)
 
-	for i := 1; i < len(data_points); i += 1 {
-		a := normalized_points[i-1]
-		b := normalized_points[i]
-		q := quadratics[i]
-		fmt.printfln("y = %vx^2 + %vx + %v \\left\\{{%v \\leq x \\leq %v \\right\\}}", q[0], q[1], q[2], a.x, b.x)
+	for _ in 0 ..< args.sample_size {
+		x := points.inverse_cdf(rand.float64(), normalized_points, prefix_area, quadratics)
+		fmt.println(x)
 	}
-
-	// for q in quadratics[1:] {
-	// 	fmt.printfln("y = %vx^2 + %vx + %v", q[0], q[1], q[2])
-	// }
 }

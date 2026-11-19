@@ -1,5 +1,6 @@
 package points
 
+import "core:math"
 Point :: [2]f64
 
 calculate_area :: proc(points: []Point) -> f64 {
@@ -58,4 +59,33 @@ calculate_quadratics :: proc(points: []Point, allocator := context.allocator) ->
 		append(&quadratics, {A, B, C})
 	}
 	return quadratics[:]
+}
+
+inverse_cdf :: proc(u: f64, points: []Point, prefix: []f64, quadratics: []Quadratic) -> f64 {
+	assert(0.0 < u && u < 1.0)
+
+	lo := 0 // F(lo) <= u
+	hi := len(prefix) - 1 // F(hi > u)
+	for lo + 1 < hi {
+		mid := (lo + hi) / 2
+		if prefix[mid] <= u {
+			lo = mid
+		} else {
+			hi = mid
+		}
+	}
+
+	u_prime := u - prefix[lo]
+
+	A := quadratics[hi][0]
+	B := quadratics[hi][1]
+	C := quadratics[hi][2] - u_prime
+
+	x_plus := (-B + math.sqrt(B * B - 4 * A * C)) / (2 * A)
+	x_minus := (-B - math.sqrt(B * B - 4 * A * C)) / (2 * A)
+
+	if points[lo].x <= x_plus && x_plus <= points[hi].x {
+		return x_plus
+	}
+	return x_minus
 }
